@@ -1,2 +1,9 @@
-# CST205_Project
-Group Project for CST 205 Team 12475
+# Weather App Project
+
+Starter files.
+
+
+- **PySide6 (Qt)** for the GUI  
+- **Folium** for interactive maps  
+- **Open-Meteo API** for weather data  
+- **Local styles, images, icons, and audio**  
