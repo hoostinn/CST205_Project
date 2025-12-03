@@ -11,4 +11,4 @@ def get_weather(lat, long):
     url = "https://api.open-meteo.com/v1/forecast"
     params = {"latitude" : lat, "longitude": long, "hourly": ",".join(features)}
     r = requests.get(url, params = params)
-    return r.json
+    return r.json()

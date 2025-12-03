@@ -37,9 +37,11 @@ class WeatherAppGUI(QWidget):
 
         self.info_title = QLabel("Weather Info")
         self.info_title.setFont(QFont("Arial", 22))
+        self.info_title.setStyleSheet("color: black;")
         info_layout.addWidget(self.info_title)
         self.weather_label = QLabel("Search a city to display the weather!")
         self.weather_label.setFont(QFont("Arial", 20))
+        self.weather_label.setStyleSheet("color: black;")
         info_layout.addWidget(self.weather_label)
 
         # RIGHT SIDE (SEARCH + MAP)
@@ -53,12 +55,13 @@ class WeatherAppGUI(QWidget):
         self.search_box = QLineEdit()
         self.search_box.setPlaceholderText("Search city...")
         self.search_box.setObjectName("searchBox")
+        self.search_box.setStyleSheet("color: black;")
         self.search_box.setFixedHeight(45)
 
         search_btn = QPushButton("🔍")
         search_btn.setObjectName("searchBtn")
         search_btn.setFixedSize(45, 45)
-        self.search_btn.clicked.connect(self.find_weather)
+        search_btn.clicked.connect(self.find_weather)
 
         menu_btn = QPushButton("☰")
         menu_btn.setObjectName("menuBtn")
@@ -110,5 +113,5 @@ class WeatherAppGUI(QWidget):
         rain_prob = hourly["precipitation_probability"][0]
         wind = hourly["wind_speed_180m"][0]
         cloud = hourly["cloud_cover"][0]
-        weatherinfo = f"{name}\n Temp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
+        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
         self.weather_label.setText(weatherinfo)
