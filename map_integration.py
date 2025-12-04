@@ -1,19 +1,22 @@
-# Matteo Part 
 # Integration of Map into GUI
 # map_integration.py
 # Handles loading Folium maps into the Qt GUI
 
-import os
-from PySide6.QtCore import QUrl
+import io
+import folium 
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
 def load_map_into_gui(window):
-    map_path = os.path.abspath("maps/map.html")
+    # Map of the US
+    latitude, longitude = 39, -100
+    map = folium.Map(location=[latitude, longitude], zoom_start=4)
 
-    if not os.path.exists(map_path):
-        raise FileNotFoundError("maps/map.html not found")
+    # Convert to HTML
+    data = io.BytesIO()
+    map.save(data, close_file=False)
 
-    view = QWebEngineView()
-    view.load(QUrl.fromLocalFile(map_path))
+    # Add map to QWidget
+    webView = QWebEngineView()
+    webView.page().setHtml(data.getvalue().decode())
 
-    window.set_map_widget(view)
+    window.set_map_widget(webView)
