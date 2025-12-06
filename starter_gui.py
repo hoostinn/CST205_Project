@@ -53,7 +53,7 @@ class WeatherAppGUI(QWidget):
         top_bar.setSpacing(10)
 
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText("Search city...")
+        self.search_box.setPlaceholderText("Search city or zip code...")
         self.search_box.setObjectName("searchBox")
         self.search_box.setStyleSheet("color: black;")
         self.search_box.setFixedHeight(45)
