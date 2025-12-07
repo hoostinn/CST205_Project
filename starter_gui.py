@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QFont
 import sys
+from weather_api import get_location, get_weather
 
 try:
     from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -36,7 +37,12 @@ class WeatherAppGUI(QWidget):
 
         self.info_title = QLabel("Weather Info")
         self.info_title.setFont(QFont("Arial", 22))
+        self.info_title.setStyleSheet("color: black;")
         info_layout.addWidget(self.info_title)
+        self.weather_label = QLabel("Search a city to display the weather!")
+        self.weather_label.setFont(QFont("Arial", 20))
+        self.weather_label.setStyleSheet("color: black;")
+        info_layout.addWidget(self.weather_label)
 
         # RIGHT SIDE (SEARCH + MAP)
         right_side = QVBoxLayout()
@@ -47,13 +53,15 @@ class WeatherAppGUI(QWidget):
         top_bar.setSpacing(10)
 
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText("Search city...")
+        self.search_box.setPlaceholderText("Search city or zip code...")
         self.search_box.setObjectName("searchBox")
+        self.search_box.setStyleSheet("color: black;")
         self.search_box.setFixedHeight(45)
 
         search_btn = QPushButton("🔍")
         search_btn.setObjectName("searchBtn")
         search_btn.setFixedSize(45, 45)
+        search_btn.clicked.connect(self.find_weather)
 
         menu_btn = QPushButton("☰")
         menu_btn.setObjectName("menuBtn")
@@ -93,3 +101,17 @@ class WeatherAppGUI(QWidget):
             if child.widget():
                 child.widget().deleteLater()
         layout.addWidget(widget)
+    def find_weather(self):
+        city = self.search_box.text()
+        location = get_location(city)
+        lat = location["latitude"]
+        long = location["longitude"]
+        name = location["name"]
+        weather = get_weather(lat, long)
+        hourly = weather["hourly"]
+        temp = hourly["temperature_2m"][0]
+        rain_prob = hourly["precipitation_probability"][0]
+        wind = hourly["wind_speed_180m"][0]
+        cloud = hourly["cloud_cover"][0]
+        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
+        self.weather_label.setText(weatherinfo)
