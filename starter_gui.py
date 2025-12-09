@@ -74,6 +74,7 @@ class WeatherAppGUI(QWidget):
         #  Map Panel 
         self.map_frame = QFrame()
         self.map_frame.setObjectName("mapFrame")
+        self.map_frame.clicked.connect(self.weather_from_map)
 
         map_layout = QVBoxLayout(self.map_frame)
 
@@ -114,4 +115,14 @@ class WeatherAppGUI(QWidget):
         wind = hourly["wind_speed_180m"][0]
         cloud = hourly["cloud_cover"][0]
         weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
+        self.weather_label.setText(weatherinfo)
+    def weather_from_map(self): # weather from map click
+        map = self.map_frame
+        data = get_weather(map['last_clicked']['lat'],map['last_clicked']['lng'])
+        hourly = data["hourly"]
+        temp = hourly["temperature_2m"][0]
+        rain_prob = hourly["precipitation_probability"][0]
+        wind = hourly["wind_speed_180m"][0]
+        cloud = hourly["cloud_cover"][0]
+        weatherinfo = f"Temp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
         self.weather_label.setText(weatherinfo)
