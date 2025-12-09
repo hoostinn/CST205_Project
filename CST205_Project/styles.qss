@@ -1,0 +1,49 @@
+#infoPanel {
+    background-color: #F4F4F4;
+    border-radius: 25px;
+}
+
+#mapFrame {
+    background-color: white;
+    border-radius: 25px;
+}
+
+#searchBox {
+    border-radius: 20px;
+    border: 2px solid #999;
+    padding-left: 15px;
+    font-size: 18px;
+    background: #FFFFFF;
+}
+
+#searchBtn, #menuBtn {
+    border-radius: 22px;
+    background-color: #E0E0E0;
+    font-size: 22px;
+    border: none;
+}
+
+#sideMenu {
+    background-color: #2b2b2b;
+    border-radius: 18px;
+    padding: 12px;
+}
+
+#sideMenu QLabel {
+    color: white;
+}
+
+/* Saved location buttons */
+#locationBtn {
+    background-color: #3a3a3a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 6px 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+#locationBtn:hover {
+    background-color: #4a4a4a;
+}
