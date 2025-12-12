@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QApplication, QWidget, QHBoxLayout, QVBoxLayout,
     QLineEdit, QPushButton, QLabel, QFrame
 )
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import Qt, QUrl, Signal, Slot
 from PySide6.QtGui import QFont
 import sys
 from weather_api import get_location, get_weather
@@ -14,6 +14,10 @@ except:
 
 
 class WeatherAppGUI(QWidget):
+
+    # Getting signal from map_integration.py
+    coordinates_received_signal = Signal(float, float)
+
     def __init__(self):
         super().__init__()
 
@@ -26,6 +30,9 @@ class WeatherAppGUI(QWidget):
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(20)
+
+        # Send lat and long to the method
+        self.coordinates_received_signal.connect(self.weather_from_map)
 
         # LEFT INFO PANEL
         self.info_panel = QFrame()
@@ -115,3 +122,28 @@ class WeatherAppGUI(QWidget):
         cloud = hourly["cloud_cover"][0]
         weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
         self.weather_label.setText(weatherinfo)
+
+
+    def weather_from_map(self, newLat, newLong): # weather from map click
+        # city = self.search_box.text()
+        # location = get_location(city)
+        lat = newLat
+        long = newLong
+        name = "temp" # Grab the name of the city
+        weather = get_weather(lat, long)
+        hourly = weather["hourly"]
+        temp = hourly["temperature_2m"][0]
+        rain_prob = hourly["precipitation_probability"][0]
+        wind = hourly["wind_speed_180m"][0]
+        cloud = hourly["cloud_cover"][0]
+        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
+        self.weather_label.setText(weatherinfo)
+        
+    # def weather_from_map(self, data): # weather from map click
+    #     hourly = data["hourly"]
+    #     temp = hourly["temperature_2m"][0]
+    #     rain_prob = hourly["precipitation_probability"][0]
+    #     wind = hourly["wind_speed_180m"][0]
+    #     cloud = hourly["cloud_cover"][0]
+    #     weatherinfo = f"Temp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
+    #     self.weather_label.setText(weatherinfo)
