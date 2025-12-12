@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QUrl, Signal, Slot
 from PySide6.QtGui import QFont
 import sys
-from weather_api import get_location, get_weather
+from weather_api import get_location, get_weather, coord_location
 
 try:
     from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -122,14 +122,10 @@ class WeatherAppGUI(QWidget):
         cloud = hourly["cloud_cover"][0]
         weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
         self.weather_label.setText(weatherinfo)
-
-
     def weather_from_map(self, newLat, newLong): # weather from map click
-        # city = self.search_box.text()
-        # location = get_location(city)
         lat = newLat
         long = newLong
-        name = "temp" # Grab the name of the city
+        name = coord_location(lat, long)
         weather = get_weather(lat, long)
         hourly = weather["hourly"]
         temp = hourly["temperature_2m"][0]
@@ -138,12 +134,3 @@ class WeatherAppGUI(QWidget):
         cloud = hourly["cloud_cover"][0]
         weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
         self.weather_label.setText(weatherinfo)
-        
-    # def weather_from_map(self, data): # weather from map click
-    #     hourly = data["hourly"]
-    #     temp = hourly["temperature_2m"][0]
-    #     rain_prob = hourly["precipitation_probability"][0]
-    #     wind = hourly["wind_speed_180m"][0]
-    #     cloud = hourly["cloud_cover"][0]
-    #     weatherinfo = f"Temp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
-    #     self.weather_label.setText(weatherinfo)
