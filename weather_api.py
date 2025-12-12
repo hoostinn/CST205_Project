@@ -15,3 +15,13 @@ def get_weather(lat, long):
     params = {"latitude" : lat, "longitude": long, "hourly": ",".join(features)}
     r = requests.get(url, params = params)
     return r.json()
+def coord_location(lat, long):
+    url = "https://nominatim.openstreetmap.org/reverse"
+    params = {"lat": lat, "lon": long, "format": "json", "addressdetails": 1}
+    headers = {"User-Agent": "weather-app"}
+    r = requests.get(url, params=params, headers=headers)
+    data = r.json()
+    addy = data["address"]
+    city = addy.get("city")
+    state = addy.get("state")
+    return f"{city}, {state}"
