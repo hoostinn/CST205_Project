@@ -3,7 +3,7 @@
 # Handles loading Folium maps into the Qt GUI
 
 import io
-import folium 
+import folium
 from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from streamlit_folium import st_folium
@@ -95,7 +95,7 @@ def custom_code(popup_variable_name, map_variable_name, folium_port):
                             longitude: window._clickedLng
                         }})
                     }});
-                    L.marker([window._clickedLat, window._clickedLng]).addTo({map_variable_name});
+                    //L.marker([window._clickedLat, window._clickedLng]).addTo({map_variable_name});
                 "> Yes </button>
 
             `)
@@ -153,16 +153,16 @@ def load_map_into_gui(window):
 
     # Map of the US
     latitude, longitude = 39, -100
-    map = folium.Map(location=[latitude, longitude], zoom_start=4)
+    map = folium.Map(location=[latitude, longitude], zoom_start=4, max_bounds=True, min_zoom=2)
 
 
     # Add Popup
     folium.LatLngPopup().add_to(map)
 
     # Adding marker
-    folium.Marker(
-        location=[latitude, longitude]
-    ).add_to(map)
+    # folium.Marker(
+    #     location=[latitude, longitude]
+    # ).add_to(map)
 
     # Save the mapfile
     map.save(map_filepath)
