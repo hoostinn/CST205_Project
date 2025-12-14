@@ -60,6 +60,8 @@ class WeatherAppGUI(QWidget):
         info_layout.addWidget(self.icon_label, alignment=Qt.AlignHCenter)
         self.icon_label.setScaledContents(True)
         self.icon_label.setPixmap(QPixmap("Images/ICONS/Loading.png").scaled(96,96, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        info_layout.addSpacing(40)
+
 
         # Location line
         self.location_label = QLabel("No location selected")
@@ -111,6 +113,7 @@ class WeatherAppGUI(QWidget):
         menu_btn = QPushButton("☰")
         menu_btn.setObjectName("menuBtn")
         menu_btn.setFixedSize(45, 45)
+        menu_btn.clicked.connect(self.toggle_side_menu)
 
         top_bar.addWidget(self.search_box, 1)
         top_bar.addWidget(search_btn)
@@ -132,9 +135,52 @@ class WeatherAppGUI(QWidget):
         right_side.addLayout(top_bar)
         right_side.addWidget(self.map_frame)
 
+        self.side_menu = QFrame()
+        self.side_menu.setFixedWidth(220)
+        self.side_menu.setObjectName("sideMenu")
+        self.side_menu.setStyleSheet("background-color: #333333; border-radius: 20px;")
+
+        side_layout = QVBoxLayout(self.side_menu)
+        side_layout.setContentsMargins(15, 15, 15, 15)
+        side_layout.setSpacing(10)
+
+        side_title = QLabel("Saved Locations")
+        side_title.setStyleSheet("color: white; font-size: 20px; font-wieight: bold;")
+        side_layout.addWidget(side_title)
+
+        preset_cities = [
+            "San Jose, CA",
+            "Los Angeles, CA",
+            "Phoenix, AZ",
+            "Seattle, WA",
+            "New York, NY",
+        ]
+        for city in preset_cities:
+            btn = QPushButton(city)
+            btn.setObjectName("presetBtn")
+            btn.setFixedHeight(40)
+            btn.setCursor(Qt.PointingHandCursor)
+            btn.setStyleSheet(
+                "background-color: #555555;"
+                "border-radius: 18px;"
+                "padding-left: 14px;"
+                "padding-right: 10px;"
+                "text-align: left;"
+                "color: white;"
+                "font-size: 14px;"
+            )
+            btn.clicked.connect(self.make_city_button(city))
+            side_layout.addWidget(btn)
+            side_layout.addSpacing(8)
+
+        side_layout.addStretch()
+
+        self.side_menu.hide()
+
         # Add panels
         main_layout.addWidget(self.info_panel)
         main_layout.addLayout(right_side)
+        main_layout.addWidget(self.side_menu)
 
         #Locked window so it doesn't resize
         self.setFixedSize(self.size())
@@ -142,6 +188,15 @@ class WeatherAppGUI(QWidget):
         # Make background cover the entire info_panel and keeps it updated
         self.info_bg.setGeometry(self.info_panel.rect())
         self.info_panel.installEventFilter(self)
+
+    def toggle_side_menu(self): #toggle off and on the side menu
+        # Show if hidden, hide if visible
+        self.side_menu.setVisible(not self.side_menu.isVisible())
+
+    def make_city_button(self, city): #allows the location to be called and show info
+        def handler():
+            self.load_city_weather(city)
+        return handler
 
 
     def apply_styles(self):
@@ -154,6 +209,22 @@ class WeatherAppGUI(QWidget):
             if child.widget():
                 child.widget().deleteLater()
         layout.addWidget(widget)
+
+    def load_city_weather(self, city: str): #for preset locations
+        if not city:
+            return
+        location = get_location(city)
+        lat = location["latitude"]
+        long = location["longitude"]
+        name = location["name"]
+        weather = get_weather(lat, long)
+        hourly = weather["hourly"]
+        temp = hourly["temperature_2m"][0]
+        rain_prob = hourly["precipitation_probability"][0]
+        wind = hourly["wind_speed_180m"][0]
+        cloud = hourly["cloud_cover"][0]
+        self.update_weather_display(name, temp, rain_prob, wind, cloud)
+
     def find_weather(self):
         city = self.search_box.text()
         location = get_location(city)
