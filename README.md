@@ -16,3 +16,19 @@ Our final project is a desktop weather application built with Python + PySide6 (
 - GUI using PySide6 (Qt)
 - Custom styling and UI themes  
 - Clean file separation between API logic, UI, and data handling
+
+## How To Install
+- Make sure you have Python 3.9+ installed on your system.
+- Clone the repository and create a virtual environment:
+git clone https://github.com/hoostinn/CST205_Project.git
+cd CST205_Project
+python -m venv venv
+- Activate your virtual environment:
+*Windows:*
+venv\Scripts\activate
+*macOS:*
+source venv/bin/activate
+- Install project libraries
+pip install -r requirements.txt
+- Now that you have set up the venv and installed dependencies, you can run the main.py file
+python main.py
