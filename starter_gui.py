@@ -166,7 +166,7 @@ class WeatherAppGUI(QWidget):
         rain_prob = hourly["precipitation_probability"][0]
         wind = hourly["wind_speed_180m"][0]
         cloud = hourly["cloud_cover"][0]
-        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
+        weatherinfo = f"{name}\nTemp: {temp} °C\nPrecipitation Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
         self.update_weather_display(name, temp, rain_prob, wind, cloud)
     def weather_from_map(self, newLat, newLong): # weather from map click
         lat = newLat
@@ -178,7 +178,7 @@ class WeatherAppGUI(QWidget):
         rain_prob = hourly["precipitation_probability"][0]
         wind = hourly["wind_speed_180m"][0]
         cloud = hourly["cloud_cover"][0]
-        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain: {rain_prob}%\nWind: {wind}\nCloud: {cloud}%"
+        weatherinfo = f"{name}\nTemp: {temp} °C\nPrecipitation: {rain_prob}%\nWind: {wind}\nCloud: {cloud}%"
         self.update_weather_display(name, temp, rain_prob, wind, cloud)
 
     def eventFilter(self, watched, event):
@@ -191,7 +191,7 @@ class WeatherAppGUI(QWidget):
     def update_weather_display(self, name, temp, rain_prob, wind, cloud):
         self.location_label.setText(str(name))
         self.temp_label.setText(f"Temp: {temp:.1f} °")
-        self.rain_label.setText(f"Rain: {rain_prob}%")
+        self.rain_label.setText(f"Precipitation: {rain_prob}%")
         self.wind_label.setText(f"Wind: {wind}")
         self.cloud_label.setText(f"Cloud: {cloud}%")
 
@@ -242,3 +242,4 @@ class WeatherAppGUI(QWidget):
         bg_pix = QPixmap(bg_path)
         if not bg_pix.isNull():
             self.info_bg.setPixmap(bg_pix)
+
