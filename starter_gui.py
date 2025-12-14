@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import (
     QApplication, QWidget, QHBoxLayout, QVBoxLayout,
-    QLineEdit, QPushButton, QLabel, QFrame
+    QLineEdit, QPushButton, QLabel, QFrame, QGridLayout
 )
-from PySide6.QtCore import Qt, QUrl, Signal, Slot
-from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt, QUrl, Signal, Slot, QEvent
+from PySide6.QtGui import QFont, QPixmap
 import sys
 from weather_api import get_location, get_weather, coord_location
 
@@ -36,20 +36,58 @@ class WeatherAppGUI(QWidget):
 
         # LEFT INFO PANEL
         self.info_panel = QFrame()
-        self.info_panel.setMinimumWidth(300)
+        self.info_panel.setFixedWidth(300)
         self.info_panel.setObjectName("infoPanel")
+
+        #Default BG for left panel
+        self.info_bg = QLabel(self.info_panel)
+        self.info_bg.setPixmap(QPixmap("Images/BACKGROUNDS/loading.png"))
+        self.info_bg.setScaledContents(True)
+        self.info_bg.lower()
 
         info_layout = QVBoxLayout(self.info_panel)
         info_layout.setAlignment(Qt.AlignTop)
 
-        self.info_title = QLabel("Weather Info")
+        self.info_title = QLabel("Weather Information")
         self.info_title.setFont(QFont("Arial", 22))
         self.info_title.setStyleSheet("color: black;")
         info_layout.addWidget(self.info_title)
-        self.weather_label = QLabel("Search a city to display the weather!")
-        self.weather_label.setFont(QFont("Arial", 20))
-        self.weather_label.setStyleSheet("color: black;")
-        info_layout.addWidget(self.weather_label)
+
+        # Icon 
+        self.icon_label = QLabel()
+        self.icon_label.setFixedSize(96, 96)
+        self.icon_label.setAlignment(Qt.AlignCenter)
+        info_layout.addWidget(self.icon_label, alignment=Qt.AlignHCenter)
+        self.icon_label.setScaledContents(True)
+        self.icon_label.setPixmap(QPixmap("Images/ICONS/Loading.png").scaled(96,96, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
+        # Location line
+        self.location_label = QLabel("No location selected")
+        self.location_label.setFont(QFont("Arial", 18))
+        self.location_label.setStyleSheet("color: black;")
+        self.location_label.setWordWrap(True)
+        info_layout.addWidget(self.location_label)
+
+        # Stats grid (2x2)
+        stats_widget = QFrame()
+        stats_layout = QGridLayout(stats_widget)
+        stats_layout.setSpacing(8)
+
+        self.temp_label = QLabel("Temp: --")
+        self.rain_label = QLabel("Rain Chance: --")
+        self.wind_label = QLabel("Wind: --")
+        self.cloud_label = QLabel("Cloud Cover: --")
+
+        for lbl in (self.temp_label, self.rain_label, self.wind_label, self.cloud_label):
+            lbl.setFont(QFont("Arial", 16))
+            lbl.setStyleSheet("color: black;")
+
+        stats_layout.addWidget(self.temp_label, 0, 0)
+        stats_layout.addWidget(self.rain_label, 0, 1)
+        stats_layout.addWidget(self.wind_label, 1, 0)
+        stats_layout.addWidget(self.cloud_label, 1, 1)
+
+        info_layout.addWidget(stats_widget)
 
         # RIGHT SIDE (SEARCH + MAP)
         right_side = QVBoxLayout()
@@ -98,6 +136,14 @@ class WeatherAppGUI(QWidget):
         main_layout.addWidget(self.info_panel)
         main_layout.addLayout(right_side)
 
+        #Locked window so it doesn't resize
+        self.setFixedSize(self.size())
+
+        # Make background cover the entire info_panel and keeps it updated
+        self.info_bg.setGeometry(self.info_panel.rect())
+        self.info_panel.installEventFilter(self)
+
+
     def apply_styles(self):
         self.setStyleSheet(open("styles.qss", "r").read())
 
@@ -121,7 +167,7 @@ class WeatherAppGUI(QWidget):
         wind = hourly["wind_speed_180m"][0]
         cloud = hourly["cloud_cover"][0]
         weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
-        self.weather_label.setText(weatherinfo)
+        self.update_weather_display(name, temp, rain_prob, wind, cloud)
     def weather_from_map(self, newLat, newLong): # weather from map click
         lat = newLat
         long = newLong
@@ -132,5 +178,67 @@ class WeatherAppGUI(QWidget):
         rain_prob = hourly["precipitation_probability"][0]
         wind = hourly["wind_speed_180m"][0]
         cloud = hourly["cloud_cover"][0]
-        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain Chance: {rain_prob}%\nWind Speed: {wind}\nCloud Cover: {cloud}%"
-        self.weather_label.setText(weatherinfo)
+        weatherinfo = f"{name}\nTemp: {temp} degrees\nRain: {rain_prob}%\nWind: {wind}\nCloud: {cloud}%"
+        self.update_weather_display(name, temp, rain_prob, wind, cloud)
+
+    def eventFilter(self, watched, event):
+        if watched is self.info_panel and event.type() == QEvent.Resize:
+            # keep background covering the whole panel
+            self.info_bg.setGeometry(self.info_panel.rect())
+        return super().eventFilter(watched, event)
+    
+
+    def update_weather_display(self, name, temp, rain_prob, wind, cloud):
+        self.location_label.setText(str(name))
+        self.temp_label.setText(f"Temp: {temp:.1f} °")
+        self.rain_label.setText(f"Rain: {rain_prob}%")
+        self.wind_label.setText(f"Wind: {wind}")
+        self.cloud_label.setText(f"Cloud: {cloud}%")
+
+        if temp <= 0:
+            if rain_prob >= 30:
+                state = "Snowing"
+            else:
+                state = "Freezing"
+        elif rain_prob >= 50:
+            state = "Rainy"
+        elif wind >= 15:
+            state = "Windy"
+        elif cloud >= 70:
+            state = "Cloudy"
+        elif cloud >= 40:
+            state = "PartlyCloudy"
+        else:
+            state = "Sunny"
+
+        # Map states -> (icon, background)
+        icon_bg_map = {
+            "Sunny":        ("Images/ICONS/Sunny.png",
+                             "Images/BACKGROUNDS/sunnyday.png"),
+            "Cloudy":       ("Images/ICONS/Cloudy.png",
+                             "Images/BACKGROUNDS/cloudy.png"),
+            "PartlyCloudy": ("Images/ICONS/PartlyCloudy.png",
+                             "Images/BACKGROUNDS/partiallyCloudy.png"),
+            "Rainy":        ("Images/ICONS/Rainy.png",
+                             "Images/BACKGROUNDS/rainy.png"),
+            "Windy":        ("Images/ICONS/Windy.png",
+                             "Images/BACKGROUNDS/windy.png"),
+            "Freezing":     ("Images/ICONS/Freezing.png",
+                             "Images/BACKGROUNDS/Winter.png"),
+            "Snowing":      ("Images/ICONS/Snowing.png",
+                             "Images/BACKGROUNDS/Winter.png"),
+        }
+
+        icon_path, bg_path = icon_bg_map.get(state, icon_bg_map["Sunny"])
+
+        # Update icon
+        icon_pix = QPixmap(icon_path)
+        if not icon_pix.isNull():
+            self.icon_label.setPixmap(
+                icon_pix.scaled(96, 96, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            )
+
+        # Update background
+        bg_pix = QPixmap(bg_path)
+        if not bg_pix.isNull():
+            self.info_bg.setPixmap(bg_pix)
