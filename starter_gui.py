@@ -76,18 +76,14 @@ class WeatherAppGUI(QWidget):
         stats_layout.setSpacing(8)
 
         self.temp_label = QLabel("Temp: --")
-        self.rain_label = QLabel("Rain Chance: --")
+        self.rain_label = QLabel("Precipitation: --")
         self.wind_label = QLabel("Wind: --")
         self.cloud_label = QLabel("Cloud Cover: --")
 
         for lbl in (self.temp_label, self.rain_label, self.wind_label, self.cloud_label):
             lbl.setFont(QFont("Arial", 16))
             lbl.setStyleSheet("color: black;")
-
-        stats_layout.addWidget(self.temp_label, 0, 0)
-        stats_layout.addWidget(self.rain_label, 0, 1)
-        stats_layout.addWidget(self.wind_label, 1, 0)
-        stats_layout.addWidget(self.cloud_label, 1, 1)
+            stats_layout.addWidget(lbl)
 
         info_layout.addWidget(stats_widget)
 
@@ -261,9 +257,9 @@ class WeatherAppGUI(QWidget):
 
     def update_weather_display(self, name, temp, rain_prob, wind, cloud):
         self.location_label.setText(str(name))
-        self.temp_label.setText(f"Temp: {temp:.1f} °")
+        self.temp_label.setText(f"Temp: {temp:.1f} °C")
         self.rain_label.setText(f"Precipitation: {rain_prob}%")
-        self.wind_label.setText(f"Wind: {wind}")
+        self.wind_label.setText(f"Wind: {wind} km/h")
         self.cloud_label.setText(f"Cloud: {cloud}%")
 
         if temp <= 0:
