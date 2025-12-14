@@ -20,6 +20,6 @@ def coord_location(lat, long):
     r = requests.get(url, params=params, headers=headers)
     data = r.json()
     addy = data["address"]
-    city = addy.get("city") # parse the json address to get the city name
-    state = addy.get("state") # get state name
+    city = addy.get("city") or addy.get("town") or addy.get("village") or addy.get("county") # parse the json address to get the city name, if it's on the outskirts it will return county or village or town instead (whatever it can find)
+    state = addy.get("state") or ("province") # get state name, or province for other countries
     return f"{city}, {state}" # return a string to display City, State
