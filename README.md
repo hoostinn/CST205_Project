@@ -32,3 +32,7 @@ source venv/bin/activate
 pip install -r requirements.txt  
 - Now that you have set up the venv and installed dependencies, you can run the main.py file  
 python main.py  
+
+## Future Features
+- Adding a feature to save locations locally
+- Implement Fahrenheit and Celsius option as well as implementing a formula to calculate
