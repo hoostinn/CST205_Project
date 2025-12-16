@@ -36,3 +36,4 @@ python main.py
 ## Future Features
 - Adding a feature to save locations locally
 - Implement Fahrenheit and Celsius option as well as implementing a formula to calculate
+- Add audio when things are clicked, closed, interacted with, etc.
